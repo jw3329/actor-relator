@@ -1,32 +1,33 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const gatherActorInfo = async url => {
+const Movie = require('../node/movie');
+
+const gatherActorInfo = async actor => {
     try {
+        const url = actor.link;
         const html = (await axios.get(url)).data;
         const $ = cheerio.load(html);
         const infobox = $('.infobox.biography.vcard');
         const tr = $(infobox).contents().children('tr');
         const name = $(tr).find('.fn').text();
+        const imageUrl = 'https:' + $(tr).find('.image').find('img').attr('src');
         const bday = $(tr).find('.bday').text();
         const occupation = $(tr).find('.role').text();
         const allegiance = $(tr).find('.flagicon').first().parent().text().trim();
         const table = $('.div-col.columns.column-width').length === 0 ? true : false;
         const filmList = table ? $('#Filmography').parent().nextAll('table').eq(0) : $('.div-col.columns.column-width');
-        const movie = [];
+        const movies = [];
         const wikiUrl = 'https://en.wikipedia.org';
         if (table) {
             const trs = $(filmList).find('tbody').find('tr').next();
-            console.log(trs.eq(0).html());
             trs.each((_, tr) => {
                 const td = $(tr).find('td').eq(1);
                 const a = $(td).find('a');
                 const url = $(a).attr('href');
-                const title = $(a).text();
-                movie.push({
-                    movieUrl: wikiUrl + url,
-                    movieTitle: title
-                });
+                movies.push(
+                    new Movie(wikiUrl + url)
+                );
             });
         } else {
             const li = $(filmList).find('ul').children('li');
@@ -34,31 +35,20 @@ const gatherActorInfo = async url => {
                 // console.log(elem);
                 const a = $(elem).find('a');
                 const url = $(a).attr('href');
-                const title = $(a).text();
-                movie.push({
-                    movieUrl: wikiUrl + url,
-                    movieTitle: title
-                });
+                movies.push(
+                    new Movie(wikiUrl + url)
+                );
             });
         }
-        const actor = {
-            name,
-            bday,
-            occupation,
-            allegiance,
-            movie
-        }
-        return actor
+        actor.name = name;
+        actor.imageUrl = imageUrl;
+        actor.bday = bday;
+        actor.occupation = occupation;
+        actor.allegiance = allegiance;
+        actor.movies = movies;
     } catch (error) {
-        return error;
+        console.log(error);
     }
 }
 
-const gatherMovieInfo = async () => {
-
-}
-
-module.exports = {
-    gatherActorInfo,
-    gatherMovieInfo
-}
+module.exports = gatherActorInfo;
