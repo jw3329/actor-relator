@@ -25,7 +25,7 @@ const gatherActorInfo = async actor => {
                 const td = $(tr).find('td').eq(1);
                 const a = $(td).find('a');
                 const url = $(a).attr('href');
-                movies.push(
+                url && movies.push(
                     new Movie(wikiUrl + url)
                 );
             });
@@ -35,7 +35,7 @@ const gatherActorInfo = async actor => {
                 // console.log(elem);
                 const a = $(elem).find('a');
                 const url = $(a).attr('href');
-                movies.push(
+                url && movies.push(
                     new Movie(wikiUrl + url)
                 );
             });

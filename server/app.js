@@ -10,7 +10,6 @@ const axios = require('axios');
 app.use(cors());
 
 const Actor = require('./node/actor');
-const Movie = require('./node/movie');
 
 app.get('/', async (req, res) => {
     const url = "https://en.wikipedia.org/w/api.php";
@@ -28,9 +27,9 @@ app.get('/', async (req, res) => {
             params
         })).data;
         if (data[1][0].toLowerCase() === searchName.toLowerCase()) {
-            const actor = new Actor(data[3][0]);
+            const actor = new Actor(data[3][0])
             await gatherInfo.gatherActorInfo(actor);
-            const limit = 100;
+            const limit = 300;
             res.send(await actorMovieBFS(actor, limit));
         } else {
             res.send("Your search page '" + searchName + "' does not exists on English Wikipedia");
@@ -47,25 +46,43 @@ const actorMovieBFS = async (actor, limit) => {
     const actorQueue = [];
     const movieQueue = [];
     actorQueue.push(actor);
-    while (actorQueue && count <= limit) {
+    count++;
+    while (actorQueue.length > 0 && count <= limit) {
+        console.log('first');
         const actor = actorQueue.pop(0);
-        actorSet.add(actor);
-        count++;
-        actor.movies.forEach(async movie => {
-            await gatherInfo.gatherMovieInfo(movie);
-            !movieSet.has(movie) && movieQueue.push(movie);
-        });
-        while (movieQueue && count <= limit) {
-            const movie = movieQueue.pop(0);
-            movieSet.add(movie);
-            count++;
-            movie.starring.forEach(async actor => {
-                await gatherInfo.gatherActorInfo(actor);
-                !actorSet.has(actor) && actorQueue.push(actor);
-            });
+        if (actorSet.has(actor.link)) continue;
+        actorSet.add(actor.link);
+        for (const movie of actor.movies) {
+            if (!movieSet.has(movie.link)) {
+                try {
+                    await gatherInfo.gatherMovieInfo(movie);
+                    movieQueue.push(movie);
+                    count++;
+                } catch (error) {
+                    console.log(error);
+                }
+            }
+            console.log(actorQueue.length, movieQueue.length, count);
         }
+        while (movieQueue.length > 0 && count <= limit) {
+            const movie = movieQueue.pop(0);
+            if (movieSet.has(movie.link)) continue;
+            movieSet.add(movie.link);
+            for (const actor of movie.starring) {
+                if (!actorSet.has(actor.link)) {
+                    try {
+                        await gatherInfo.gatherActorInfo(actor);
+                        actorQueue.push(actor);
+                        count++;
+                    } catch (error) {
+                        console.log(error);
+                    }
+                }
+                console.log(actorQueue.length, movieQueue.length, count);
+            }
+        }
+        console.log('out of second');
     }
-    console.log(actor);
     return actor;
 }
 
