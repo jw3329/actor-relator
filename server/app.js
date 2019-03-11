@@ -29,7 +29,7 @@ app.get('/', async (req, res) => {
         if (data[1][0].toLowerCase() === searchName.toLowerCase()) {
             const actor = new Actor(data[3][0])
             await gatherInfo.gatherActorInfo(actor);
-            const limit = 300;
+            const limit = 5;
             res.send(await actorMovieBFS(actor, limit));
         } else {
             res.send("Your search page '" + searchName + "' does not exists on English Wikipedia");
