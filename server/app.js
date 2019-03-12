@@ -27,9 +27,9 @@ app.get('/', async (req, res) => {
             params
         })).data;
         if (data[1][0].toLowerCase() === searchName.toLowerCase()) {
-            const actor = new Actor(data[3][0])
+            const actor = new Actor(data[3][0], data[1][0]);
             await gatherInfo.gatherActorInfo(actor);
-            const limit = 5;
+            const limit = 20;
             res.send(await actorMovieBFS(actor, limit));
         } else {
             res.send("Your search page '" + searchName + "' does not exists on English Wikipedia");
@@ -40,8 +40,7 @@ app.get('/', async (req, res) => {
 });
 
 const actorMovieBFS = async (actor, limit) => {
-    const actorSet = new Set();
-    const movieSet = new Set();
+    const idSet = new Set();
     let count = 0;
     const actorQueue = [];
     const movieQueue = [];
@@ -50,12 +49,12 @@ const actorMovieBFS = async (actor, limit) => {
     while (actorQueue.length > 0 && count <= limit) {
         console.log('first');
         const actor = actorQueue.pop(0);
-        if (actorSet.has(actor.link)) continue;
-        actorSet.add(actor.link);
+        if (idSet.has(actor.id)) continue;
+        idSet.add(actor.id);
         for (const movie of actor.movies) {
-            if (!movieSet.has(movie.link)) {
+            if (!idSet.has(movie.id)) {
                 try {
-                    await gatherInfo.gatherMovieInfo(movie);
+                    await gatherInfo.gatherMovieInfo(movie, actor.name);
                     movieQueue.push(movie);
                     count++;
                 } catch (error) {
@@ -66,12 +65,12 @@ const actorMovieBFS = async (actor, limit) => {
         }
         while (movieQueue.length > 0 && count <= limit) {
             const movie = movieQueue.pop(0);
-            if (movieSet.has(movie.link)) continue;
-            movieSet.add(movie.link);
+            if (idSet.has(movie.id)) continue;
+            idSet.add(movie.id);
             for (const actor of movie.starring) {
-                if (!actorSet.has(actor.link)) {
+                if (!idSet.has(actor.id)) {
                     try {
-                        await gatherInfo.gatherActorInfo(actor);
+                        await gatherInfo.gatherActorInfo(actor, movie.title);
                         actorQueue.push(actor);
                         count++;
                     } catch (error) {

@@ -1,6 +1,10 @@
+const uuidv4 = require('uuid/v4');
+
 class Node {
-    constructor(link) {
+    constructor(link, actor) {
+        this.id = uuidv4();
         this.link = link;
+        this.actor = actor;
     }
 }
 

@@ -10,9 +10,15 @@ const App = () => {
 
     const [actor, setActor] = useState('');
     const [spinner, setSpinner] = useState(false);
+    const [network, setNetwork] = useState(null);
 
     const handleSubmit = async e => {
         e.preventDefault();
+        console.log(network);
+        if (network) {
+            network.destroy();
+            setNetwork(null);
+        }
         setSpinner(true);
         const data = await (
             await axios.get(`${config.server.url}:${config.server.port}`, {
@@ -22,55 +28,91 @@ const App = () => {
             })
         ).data;
         visualize(data);
-        setSpinner(false);
         console.log(data);
     }
 
-    const visualize = data => {
+    const visualize = async data => {
         const nodeList = [];
         const edgeList = [];
         const actorQueue = [];
         const movieQueue = [];
-        const actorSet = new Set();
-        const movieSet = new Set();
+        const idSet = new Set();
         actorQueue.push(data);
-        while (actorQueue) {
+        while (actorQueue.length > 0) {
             const actorNode = actorQueue.pop(0);
-            if (!actorNode || actorSet.has(actorNode.name)) continue;
-            actorSet.add(actorNode.name);
+            if (idSet.has(actorNode.id)) continue;
+            idSet.add(actorNode.id);
             nodeList.push({
-                id: actorNode.name,
-                label: actorNode.name
+                id: actorNode.id,
+                label: actorNode.name,
+                group: 'actor',
+                font: {
+                    color: 'white'
+                },
+                link: actorNode.link
             });
-            actorNode.movies.forEach(movie => {
-                movieQueue.push(movie);
-                edgeList.push({
-                    from: actorNode.name,
-                    to: movie.title
-                });
-            })
-            while (movieQueue) {
-                const movieNode = movieQueue.pop(0);
-                if (!movieNode || movieSet.has(movieNode.title)) continue;
-                movieSet.add(movieNode.title);
-                nodeList.push({
-                    id: movieNode.title,
-                    label: movieNode.title
-                });
-                movieNode.starring.forEach(actor => {
-                    actorQueue.push(actor);
+            if (actorNode.movies) {
+                for (const movie of actorNode.movies) {
+                    movieQueue.push(movie);
                     edgeList.push({
-                        from: movieNode.title,
-                        to: actor.name
+                        from: actorNode.id,
+                        to: movie.id
                     });
-                });
+                }
             }
+            while (movieQueue.length > 0) {
+                const movieNode = movieQueue.pop(0);
+                if (idSet.has(movieNode.id)) continue;
+                idSet.add(movieNode.id);
+                nodeList.push({
+                    id: movieNode.id,
+                    label: movieNode.title,
+                    group: 'movie',
+                    font: {
+                        color: 'white'
+                    },
+                    link: movieNode.link
+                });
+                if (movieNode.starring) {
+                    for (const actor of movieNode.starring) {
+                        actorQueue.push(actor);
+                        edgeList.push({
+                            from: movieNode.id,
+                            to: actor.id
+                        });
+                    }
+                }
+            }
+            console.log(actorQueue, movieQueue);
         }
         const nodes = new vis.DataSet(nodeList);
         const edges = new vis.DataSet(edgeList);
         const container = document.getElementById('network');
         const networkData = { nodes, edges }
-        new vis.Network(container, networkData);
+        setSpinner(false);
+        const options = {
+            layout: {
+                improvedLayout: false
+            },
+            groups: {
+                actor: {
+                    shape: 'oval',
+                    color: 'green'
+                },
+                movie: {
+                    shape: 'oval',
+                    color: 'blue'
+                }
+            }
+        }
+        const network = new vis.Network(container, networkData, options);
+        network.on('click', obj => {
+            // const ids = obj.nodes;
+            // const clicked = nodes.get(ids);
+            // console.log(clicked);
+            window.open(nodes.get(obj.nodes[0]).link, '_blank').focus();
+        })
+        setNetwork(network);
     }
 
     return (
