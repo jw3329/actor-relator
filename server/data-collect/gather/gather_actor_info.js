@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const Movie = require('../node/movie');
+const Movie = require('../../node/movie');
 
 const gatherActorInfo = async (actor, movieTitle) => {
     try {

@@ -1,7 +1,7 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
-const Actor = require('../node/actor');
+const Actor = require('../../node/actor');
 
 const getElemInTable = ($, tr, text) => {
     return $(tr).find('th').filter((_, elem) => $(elem).text().trim() === text.trim());
