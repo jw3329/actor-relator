@@ -3,8 +3,8 @@ const cors = require('cors');
 const axios = require('axios');
 
 const gatherInfo = require('./data-collect/gather');
-const { actorMovieBFS } = require('./data-collect/search');
-const Actor = require('./node/actor');
+const nodeBFS = require('./data-collect/search');
+const { Actor, Movie } = require('./node');
 
 const app = express();
 const port = 8080;
@@ -29,11 +29,16 @@ app.get('/', async (req, res) => {
             params
         })).data;
         if (data[1][0].toLowerCase() === search.toLowerCase()) {
+            let node = null;
             if (selected === 'Actor') {
-                const actor = new Actor(data[3][0], data[1][0]);
-                await gatherInfo.gatherActorInfo(actor);
-                res.send(await actorMovieBFS(actor, limit));
+                node = new Actor(data[3][0], data[1][0]);
+                await gatherInfo.gatherActorInfo(node);
+            } else if (selected == 'Movie') {
+                node = new Movie(data[3][0], data[1][0]);
+                await gatherInfo.gatherMovieInfo(node);
+                console.log(node);
             }
+            res.send(await nodeBFS(node, limit));
         } else {
             res.send("Your search page '" + search + "' does not exists on English Wikipedia");
         }

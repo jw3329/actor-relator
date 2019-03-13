@@ -1,17 +1,19 @@
 const getActor = require('./get_actor');
 const getMovie = require('./get_movie');
 
-const actorMovieBFS = async (actor, limit) => {
+const nodeBFS = async (node, limit) => {
     const idSet = new Set();
     let count = 0;
     const actorQueue = [];
     const movieQueue = [];
-    actorQueue.push(actor);
+    node.actor ? actorQueue.push(node) : movieQueue.push(node);
     count++;
-    await getActor(limit, idSet, actorQueue, movieQueue, count, getMovie, true);
-    return actor;
+    node.actor
+        ?
+        await getActor(limit, idSet, actorQueue, movieQueue, count, getMovie, true)
+        :
+        await getMovie(limit, idSet, actorQueue, movieQueue, count, getActor, true)
+    return node;
 }
 
-module.exports = {
-    actorMovieBFS
-}
+module.exports = nodeBFS;

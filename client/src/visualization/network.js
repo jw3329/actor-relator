@@ -5,50 +5,52 @@ const getNodeEdgeLists = data => {
     const edgeList = [];
     const actorQueue = [];
     const movieQueue = [];
+    const dataQueue = [];
     const idSet = new Set();
-    actorQueue.push(data);
+    dataQueue.push(data);
     // BFS way of forming node and edge
-    while (actorQueue.length > 0) {
-        const actorNode = actorQueue.pop(0);
-        if (idSet.has(actorNode.id)) continue;
-        idSet.add(actorNode.id);
+    while (dataQueue.length > 0) {
+        const dataNode = dataQueue.pop(0);
+        if (idSet.has(dataNode.id)) continue;
+        idSet.add(dataNode.id);
         nodeList.push({
-            id: actorNode.id,
-            label: actorNode.name,
-            group: 'actor',
+            id: dataNode.id,
+            label: dataNode.actor ? dataNode.name : dataNode.title,
+            group: dataNode.actor ? 'actor' : 'movie',
             font: {
                 color: 'white'
             },
-            link: actorNode.link
+            link: dataNode.link
         });
-        actorNode.movies && actorNode.movies.forEach(movie => {
-            movieQueue.push(movie);
+        const list = dataNode.actor ? dataNode.movies : dataNode.starring;
+        list && list.forEach(elem => {
+            dataQueue.push(elem);
             edgeList.push({
-                from: actorNode.id,
-                to: movie.id
+                from: dataNode.id,
+                to: elem.id
             });
         });
-        while (movieQueue.length > 0) {
-            const movieNode = movieQueue.pop(0);
-            if (idSet.has(movieNode.id)) continue;
-            idSet.add(movieNode.id);
-            nodeList.push({
-                id: movieNode.id,
-                label: movieNode.title,
-                group: 'movie',
-                font: {
-                    color: 'white'
-                },
-                link: movieNode.link
-            });
-            movieNode.starring && movieNode.starring.forEach(actor => {
-                actorQueue.push(actor);
-                edgeList.push({
-                    from: movieNode.id,
-                    to: actor.id
-                });
-            });
-        }
+        // while (movieQueue.length > 0) {
+        //     const movieNode = movieQueue.pop(0);
+        //     if (idSet.has(movieNode.id)) continue;
+        //     idSet.add(movieNode.id);
+        //     nodeList.push({
+        //         id: movieNode.id,
+        //         label: movieNode.title,
+        //         group: 'movie',
+        //         font: {
+        //             color: 'white'
+        //         },
+        //         link: movieNode.link
+        //     });
+        //     movieNode.starring && movieNode.starring.forEach(actor => {
+        //         actorQueue.push(actor);
+        //         edgeList.push({
+        //             from: movieNode.id,
+        //             to: actor.id
+        //         });
+        //     });
+        // }
     }
     return [nodeList, edgeList];
 }

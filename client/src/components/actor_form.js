@@ -12,7 +12,7 @@ const ActorForm = ({ handleSubmit, setSearch, setSelected, setLimit }) => {
                                 <option>Actor</option>
                                 <option>Movie</option>
                             </select>
-                            <input type="number" className="form-control offset-1 col-4" onChange={e => setLimit(e.target.value)} placeholder="Limit" required />
+                            <input type="number" min="1" className="form-control offset-1 col-4" onChange={e => setLimit(e.target.value)} placeholder="Limit" required />
                         </div>
                         <div className="form-group m-2">
                             <input type="text" className="form-control" onChange={e => setSearch(e.target.value)} placeholder="Enter actor name" required />
