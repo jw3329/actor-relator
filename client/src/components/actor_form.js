@@ -1,6 +1,6 @@
 import React from 'react';
 
-const ActorForm = ({ handleSubmit, setSearch, setSelected, setLimit }) => {
+const ActorForm = ({ handleSubmit, setSearch, setSelected, setLimit, invalid, errorMsg }) => {
     return (
         <div className="col-sm-3 d-flex-inline justify-content-start mt-5 h-25">
             <div className="card text-center">
@@ -15,7 +15,12 @@ const ActorForm = ({ handleSubmit, setSearch, setSelected, setLimit }) => {
                             <input type="number" min="1" className="form-control offset-1 col-4" onChange={e => setLimit(e.target.value)} placeholder="Limit" required />
                         </div>
                         <div className="form-group m-2">
-                            <input type="text" className="form-control" onChange={e => setSearch(e.target.value)} placeholder="Enter actor name" required />
+                            <input type="text" className={"form-control" + (invalid ? ' is-invalid' : '')} onChange={e => setSearch(e.target.value)} placeholder="Enter actor name" required />
+                            {errorMsg && (
+                                <div className="invalid-feedback">
+                                    {errorMsg}
+                                </div>
+                            )}
                         </div>
                         <button type="submit" className="btn btn-primary m-2">Submit</button>
                     </form>
