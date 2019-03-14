@@ -3,8 +3,6 @@ import vis from 'vis';
 const getNodeEdgeLists = data => {
     const nodeList = [];
     const edgeList = [];
-    const actorQueue = [];
-    const movieQueue = [];
     const dataQueue = [];
     const idSet = new Set();
     dataQueue.push(data);
@@ -30,27 +28,6 @@ const getNodeEdgeLists = data => {
                 to: elem.id
             });
         });
-        // while (movieQueue.length > 0) {
-        //     const movieNode = movieQueue.pop(0);
-        //     if (idSet.has(movieNode.id)) continue;
-        //     idSet.add(movieNode.id);
-        //     nodeList.push({
-        //         id: movieNode.id,
-        //         label: movieNode.title,
-        //         group: 'movie',
-        //         font: {
-        //             color: 'white'
-        //         },
-        //         link: movieNode.link
-        //     });
-        //     movieNode.starring && movieNode.starring.forEach(actor => {
-        //         actorQueue.push(actor);
-        //         edgeList.push({
-        //             from: movieNode.id,
-        //             to: actor.id
-        //         });
-        //     });
-        // }
     }
     return [nodeList, edgeList];
 }
