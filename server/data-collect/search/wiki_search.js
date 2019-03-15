@@ -26,7 +26,7 @@ const wikiSearch = async (res, { search, limit, selected }) => {
             if (selected === 'Actor') {
                 node = new Actor(data[3][0], data[1][0]);
                 await gatherActorInfo(node);
-                if (!node.occupation.includes(['Actor', 'Actress'])) throw new Error('The search is not an actor');
+                if (!node.occupation.includes('Actor') && !node.occupation.includes('Actress')) throw new Error('The search is not an actor');
             } else if (selected == 'Movie') {
                 node = new Movie(data[3][0], data[1][0]);
                 await gatherMovieInfo(node);
