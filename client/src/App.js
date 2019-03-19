@@ -58,7 +58,7 @@ const App = () => {
                     <div className="col-lg-3">
                         <ActorForm {...actorFormProps} />
                     </div>
-                    <div className="col-lg-9">
+                    <div className="offset-lg-1 col-lg-8">
                         <GraphContainer spinner={spinner} />
                     </div>
                 </div>

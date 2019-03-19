@@ -22,10 +22,9 @@ const gatherMovieInfo = async (movie, actorName) => {
         const director = getElemInTable($, tr, 'Directed by').next().text().trim().split("\n");
         const producer = getElemInTable($, tr, 'Produced by').next().text().trim().split("\n");
         const starring = [];
-        getElemInTable($, tr, 'Starring').next().find('li').each((_, li) => {
-            const a = $(li).find('a');
-            const link = a.attr('href');
-            const name = a.text().trim();
+        getElemInTable($, tr, 'Starring').next().find('a').each((_, a) => {
+            const link = $(a).attr('href');
+            const name = $(a).text().trim();
             if (!(actorName && actorName === name))
                 link && starring.push(new Actor(wikiUrl + link, name));
         });

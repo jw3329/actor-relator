@@ -25,9 +25,9 @@ const gatherActorInfo = async (actor, movieTitle) => {
                 const a = $(td).find('a');
                 const url = $(a).attr('href');
                 const title = $(a).text().trim();
-                !movieTitle || movieTitle !== title && url && movies.push(
-                    new Movie(wikiUrl + url, title)
-                );
+                if ((!movieTitle || movieTitle !== title) && url) {
+                    movies.push(new Movie(wikiUrl + url, title));
+                }
             });
         } else {
             const li = $(filmList).find('ul').children('li');
