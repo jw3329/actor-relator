@@ -2,7 +2,7 @@ import React from 'react';
 
 const ActorForm = ({ handleSubmit, setSearch, setSelected, setLimit, invalid, errorMsg }) => {
     return (
-        <div className="col-sm-3 d-flex-inline justify-content-start mt-5 h-25">
+        <div className="d-flex-inline justify-content-start mt-5 h-25">
             <div className="card text-center">
                 <div className="card-body">
                     <h5 className="card-title">Actor Relator</h5>

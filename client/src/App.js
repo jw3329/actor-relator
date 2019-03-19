@@ -55,8 +55,12 @@ const App = () => {
         <div className="App">
             <div className="container">
                 <div className="row">
-                    <ActorForm {...actorFormProps} />
-                    <GraphContainer spinner={spinner} />
+                    <div className="col-lg-3">
+                        <ActorForm {...actorFormProps} />
+                    </div>
+                    <div className="col-lg-9">
+                        <GraphContainer spinner={spinner} />
+                    </div>
                 </div>
             </div>
         </div>
